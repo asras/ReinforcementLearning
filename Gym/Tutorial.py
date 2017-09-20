@@ -65,6 +65,8 @@ for i_episode in range(1000):
 
 
 plt.plot(rewardsforplotting)
+plt.xlabel("Policy number")
+plt.ylabel("Expected reward for 10 rounds")
 plt.show()
 
 ##Render the best policy
