@@ -68,14 +68,19 @@ plt.plot(rewardsforplotting)
 plt.show()
 
 ##Render the best policy
-observation = env.reset()
-for t in range(200):
-	env.render()
-	action = Act(observation, currentBestPolicy)
-	observation, reward, done, info = env.step(action)
-	if done:
-		break;
-print("Finished after " + str(t+1) + " timesteps.")
+while(True):
+	observation = env.reset()
+	for t in range(200):
+		env.render()
+		action = Act(observation, currentBestPolicy)
+		observation, reward, done, info = env.step(action)
+		if done:
+			break;
+	print("Finished after " + str(t+1) + " timesteps.")
+	runagain = input("Run again? Y/N:")
+	if (runagain.lower() != "y"):
+		break
+
 
 #Data: currentBestPolicy, currentTrialPolicy, currentReward, currentBestReward
 # currentTrialPolicy <- Vary(currentBestPolicy)
