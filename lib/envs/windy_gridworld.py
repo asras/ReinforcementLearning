@@ -76,4 +76,4 @@ class WindyGridworldEnv(discrete.DiscreteEnv):
                 output += "\n"
 
             outfile.write(output)
-        outfile.write("\n")
+        outfile.write("\r")

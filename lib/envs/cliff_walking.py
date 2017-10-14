@@ -63,7 +63,7 @@ class CliffWalkingEnv(discrete.DiscreteEnv):
             position = np.unravel_index(s, self.shape)
             # print(self.s)
             if self.s == s:
-                output = " x "
+                output = " X "
             elif position == (3,11):
                 output = " T "
             elif self._cliff[position]:
