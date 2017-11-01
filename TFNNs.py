@@ -79,7 +79,10 @@ class SimpleQLearner:
 
 	def __init__(self):
 		self._build_model()
-
+		self.hidden1_units = 100
+		self.hidden2_units = 100
+		self.image_size = 9*9*3
+		self.action_number = 83
 	
 
 	def _build_model(self):
@@ -87,18 +90,18 @@ class SimpleQLearner:
 		hidden2_units = 100
 		image_size = 9*9*3
 		action_number = 83
-		self.input_placeholder = tf.placeholder(tf.float32, shape(batch_size, image_size))
+		self.input_placeholder = tf.placeholder(tf.float32, shape = [1, image_size])
 
-		self.y_pl = tf.placeholder(shape = [None], dtype=tf.float32, name="y")
+		self.y_pl = tf.placeholder(shape = [1], dtype=tf.float32, name="y")
 
 		#We put the chosen actions in here so we can gather the correct outputs
 		#for the loss function
-		self.action_placeholder = tf.placeholder(tf.float32, shape(batch_size, action_number))
+		self.action_placeholder = tf.placeholder(tf.int32, shape= [1])
 
 		#use name_scope to make naming easy
 		with tf.name_scope("hidden1"):
-			weights = tf.Variable(tf.truncated_normal([image_size, hidden1_units])
-				, stddev = 1.0/np.sqrt(image_size)
+			weights = tf.Variable(tf.truncated_normal([image_size, hidden1_units]
+				, stddev = 1.0/np.sqrt(float(image_size)))
 				, name = "weights")
 			#first input is dimension + init type
 			#second input is init parameters
@@ -108,11 +111,11 @@ class SimpleQLearner:
 				, name = "biases")
 
 
-			hidden1 = tf.nn.relu(tf.matmul(input_placeholder, weights) + biases)
+			hidden1 = tf.nn.relu(tf.matmul(self.input_placeholder, weights) + biases)
 
 		with tf.name_scope("hidden2"):			
-			weights = tf.Variable(tf.truncated_normal([hidden1_units, hidden2_units])
-				, stddev = 1.0/np.sqrt(hidden1_units)
+			weights = tf.Variable(tf.truncated_normal([hidden1_units, hidden2_units]
+				, stddev = 1.0/np.sqrt(float(hidden1_units)))
 				, name = "weights")
 			#first input is dimension + init type
 			#second input is init parameters
@@ -126,8 +129,8 @@ class SimpleQLearner:
 
 
 		with tf.name_scope("output_layer"):
-			weights = tf.Variable(tf.truncated_normal([hidden2_units, action_number])
-				, stddev = 1.0/np.sqrt(hidden2_units)
+			weights = tf.Variable(tf.truncated_normal([hidden2_units, action_number]
+				, stddev = 1.0/np.sqrt(float(hidden2_units)))
 				, name = "weights")
 			#first input is dimension + init type
 			#second input is init parameters
@@ -141,14 +144,14 @@ class SimpleQLearner:
 
 
 		##Set up loss
-		gather_indices = self.actions_placeholder
+		gather_indices = self.action_placeholder
 		self.action_predictions = tf.gather(tf.reshape(self.predictions, [-1]), gather_indices)
 
 		self.losses = tf.squared_difference(self.y_pl, self.action_predictions)
 		self.loss = tf.reduce_mean(self.losses)
 
 		self.optimizer = tf.train.RMSPropOptimizer(0.00025, 0.99, 0.0, 1e-6)
-		self.train_op = self.optimizer.minimize(self.loss, global_step=tf.contrib.famework
+		self.train_op = self.optimizer.minimize(self.loss, global_step=tf.contrib.framework
 		.get_global_step())
 
 	
@@ -157,13 +160,19 @@ class SimpleQLearner:
 
 	def update(self, sess, board, action, target_value):
 
-		feed_dict = {self.input_placeholder : board, self.target_value:target_value
+		feed_dict = {self.input_placeholder : board, self.y_pl:target_value
 		, self.action_placeholder : action}
 		global_step, _, loss = sess.run(
-			[tf.contrib.framework.get_global_step(), self.train_op, self.loss]
-			, feed_dict
+			[tf.contrib.framework.get_global_step(), self.train_op, self.loss], feed_dict
 		)
 		return loss
+
+	def epsilon_greedy_policy(self, sess, board, epsilon):
+		q_vals = sess.run(self.predictions, {self.input_placeholder : board})[0]
+		A = np.ones(self.action_number)*epsilon/self.action_number
+		best_action = np.argmax(q_vals)
+		A[best_action] += (1.0-epsilon)
+		return A
 
 
 
