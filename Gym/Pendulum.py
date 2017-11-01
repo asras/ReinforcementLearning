@@ -9,7 +9,7 @@ import numpy as np
 
 env = gym.make("Pendulum-v0") ##Check https://github.com/openai/gym/wiki/Pendulum-v0 for specs
 
-numberOfEpisodes = 2000
+numberOfEpisodes = 500
 numberOfTimesteps = 200
 numberOfEvaluationSteps = 20
 
