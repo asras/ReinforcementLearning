@@ -78,10 +78,12 @@ def build_tfnn():
 
 
 
+###https://www.tensorflow.org/versions/r0.12/tutorials/mnist/tf/
+
+###https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/tutorials/mnist/mnist.py
 
 
-
-
+###https://www.tensorflow.org/tutorials/layers
 
 
 
